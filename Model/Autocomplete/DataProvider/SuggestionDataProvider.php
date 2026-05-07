@@ -3,7 +3,6 @@
 namespace Tweakwise\Magento2Tweakwise\Model\Autocomplete\DataProvider;
 
 use Magento\Catalog\Model\Category;
-use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Tweakwise\Magento2Tweakwise\Model\Autocomplete\DataProviderHelper;
 use Tweakwise\Magento2Tweakwise\Model\Autocomplete\DataProviderInterface;
@@ -72,7 +71,6 @@ class SuggestionDataProvider implements DataProviderInterface
      * @param Client $client
      * @param Request $request
      * @param SuggestionBlockItemFactory $suggestionBlockItemFactory
-     * @param Visibility $visibility
      */
     public function __construct(
         Config $config,
@@ -83,8 +81,7 @@ class SuggestionDataProvider implements DataProviderInterface
         RequestFactory $suggestionRequestFactory,
         Client $client,
         Request $request,
-        protected readonly SuggestionBlockItemFactory $suggestionBlockItemFactory,
-        protected readonly Visibility $visibility
+        protected readonly SuggestionBlockItemFactory $suggestionBlockItemFactory
     ) {
         $this->config = $config;
         $this->cookieManager = $cookieManager;
@@ -226,13 +223,7 @@ class SuggestionDataProvider implements DataProviderInterface
      */
     private function addVisibilityFilter(Request $request): void
     {
-        $visibilityAttribute = $this->config->isGroupedProductsEnabled()
-            ? sprintf('parent_%s', 'visibility')
-            : 'visibility';
-
-        foreach ($this->visibility->getVisibleInSearchIds() as $visibilityValue) {
-            $request->addHiddenParameter($visibilityAttribute, $visibilityValue);
-        }
+        $this->dataProviderHelper->addVisibilityFilter($request);
     }
 
     /**
