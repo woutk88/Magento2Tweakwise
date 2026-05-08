@@ -19,6 +19,12 @@ define('Tweakwise_Magento2Tweakwise/js/analytics', ['jquery'], function($) {
                     }
 
                     if (!visual.length) {
+                        console.warn(
+                            '[Tweakwise] Could not track item click: no product element with selector ".' +
+                            config.productSelector +
+                            '" (with an id attribute) or ".visual" element found near the clicked element.',
+                            event.target
+                        );
                         return;
                     }
                 }
@@ -28,6 +34,10 @@ define('Tweakwise_Magento2Tweakwise/js/analytics', ['jquery'], function($) {
             }
 
             if (!productId) {
+                console.warn(
+                    '[Tweakwise] Could not track item click: product element found but id attribute is empty.',
+                    product || event.target
+                );
                 return;
             }
 
