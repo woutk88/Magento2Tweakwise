@@ -113,14 +113,10 @@ class ProductNavigationResponse extends Response
             // When multiple Tweakwise group codes resolve to the same Magento store ID (via
             // getStoreId), keep the maximum colspan/rowspan so that a merchandised span is
             // never silently overwritten by a subsequent item with a lower value.
-            $data[ItemType::COLSPAN] = max(
-                (int) $item->getColspan(),
-                (int) ($data[ItemType::COLSPAN] ?? 0)
-            ) ?: null;
-            $data[ItemType::ROWSPAN] = max(
-                (int) $item->getRowspan(),
-                (int) ($data[ItemType::ROWSPAN] ?? 0)
-            ) ?: null;
+            $colspan = max((int) $item->getColspan(), (int) ($data[ItemType::COLSPAN] ?? 0));
+            $data[ItemType::COLSPAN] = $colspan !== 0 ? $colspan : null;
+            $rowspan = max((int) $item->getRowspan(), (int) ($data[ItemType::ROWSPAN] ?? 0));
+            $data[ItemType::ROWSPAN] = $rowspan !== 0 ? $rowspan : null;
 
             $productData[$itemId] = $data;
         }
