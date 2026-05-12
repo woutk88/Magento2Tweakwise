@@ -352,31 +352,29 @@ class Collection extends AbstractCollection
 
         // Build a map of entity_id => array key so we can locate items regardless of the
         // (possibly reindexed) integer keys after array_splice in addVisuals().
-        $entityIdToKey = [];
-        foreach ($this->_items as $key => $item) {
+        $entityIdToKey = array_reduce(
+            array_keys($this->_items),
+            function (array $carry, $key): array {
+                $item = $this->_items[$key];
+                if ($item instanceof ProductInterface) {
+                    $carry[(int) $item->getId()] = $key;
+                }
+                return $carry;
+            },
+            []
+        );
+
+        foreach ($this->_items as $item) {
             if (!$item instanceof ProductInterface) {
                 continue;
             }
-            $entityIdToKey[(int)$item->getId()] = $key;
-        }
 
-        foreach ($this->_items as $key => $item) {
-            if (!$item instanceof ProductInterface) {
+            $twId = (int) $item->getData('tw_id');
+            if ($twId === 0 || $twId === (int) $item->getId() || !isset($entityIdToKey[$twId])) {
                 continue;
             }
 
-            $twId = (int)$item->getData('tw_id');
-            if ($twId === 0 || $twId === (int)$item->getId()) {
-                continue;
-            }
-
-            if (!isset($entityIdToKey[$twId])) {
-                continue;
-            }
-
-            $duplicateKey = $entityIdToKey[$twId];
-            unset($this->_items[$duplicateKey]);
-            unset($entityIdToKey[$twId]);
+            unset($this->_items[$entityIdToKey[$twId]], $entityIdToKey[$twId]);
         }
     }
 }
