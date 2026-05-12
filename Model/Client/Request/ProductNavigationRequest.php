@@ -30,11 +30,6 @@ class ProductNavigationRequest extends Request
     private const MAX_PRODUCTS = 1000;
 
     /**
-     * @var array
-     */
-    protected $hiddenParameters = [];
-
-    /**
      * {@inheritdoc}
      */
     public function getResponseType()
@@ -56,17 +51,6 @@ class ProductNavigationRequest extends Request
 
         $this->addParameter('tn_fk_' . $attribute, trim((string)$value));
         return $this;
-    }
-
-    /**
-     * @param string $attribute
-     * @param int $value
-     * @return void
-     */
-    public function addHiddenParameter(string $attribute, $value)
-    {
-        $this->hiddenParameters[] = sprintf('%s=%s', $attribute, $value);
-        $this->setParameter('tn_parameters', implode('&', $this->hiddenParameters));
     }
 
     /**
