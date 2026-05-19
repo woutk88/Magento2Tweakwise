@@ -118,8 +118,8 @@ class CategoryInputProvider implements FilterFormInputProviderInterface
 
         $input = [
             '__tw_ajax_type' => self::TYPE,
-            '__tw_object_id' => $this->getCategoryId(),
-            '__tw_original_url' => $url,
+            '__tw_object_id' => (int) $this->getCategoryId(),
+            '__tw_original_url' => (string) $url,
         ];
 
         $input['__tw_hash'] = $this->hashInputProvider->getHash($input);

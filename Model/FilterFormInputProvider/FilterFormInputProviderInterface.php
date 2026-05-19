@@ -9,7 +9,7 @@ interface FilterFormInputProviderInterface
      * This is needed for ajax filtering. The array should be formatted as 'name' => 'value'
      * name will be rendered as name attribute in an <input> tag and obviously value will be its value attribute
      *
-     * @return string[]
+     * @return array
      */
-    public function getFilterFormInput();
+    public function getFilterFormInput(): array;
 }
