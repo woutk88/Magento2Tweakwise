@@ -189,6 +189,7 @@ class SuggestionDataProvider implements DataProviderInterface
         $request->setSearch($query);
         $this->addProfileKeyToRequest($request, $profileKeyCookie);
         $request->addCategoryFilter($category);
+        $this->addVisibilityFilter($request);
 
         return $request;
     }
@@ -209,8 +210,20 @@ class SuggestionDataProvider implements DataProviderInterface
         $request->setSearch($query);
         $this->addProfileKeyToRequest($request, $profileKeyCookie);
         $request->addCategoryFilter($category);
+        $this->addVisibilityFilter($request);
 
         return $request;
+    }
+
+    /**
+     * Add visibility filter to the request using tn_parameters, matching the search visibility filter behaviour.
+     *
+     * @param Request $request
+     * @return void
+     */
+    private function addVisibilityFilter(Request $request): void
+    {
+        $this->dataProviderHelper->addVisibilityFilter($request);
     }
 
     /**

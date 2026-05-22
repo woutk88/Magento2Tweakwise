@@ -40,6 +40,11 @@ class Request
     protected $parameters = [];
 
     /**
+     * @var array
+     */
+    protected $hiddenParameters = [];
+
+    /**
      * @var StoreManager
      */
     protected $storeManager;
@@ -160,6 +165,19 @@ class Request
         }
 
         return $this;
+    }
+
+    /**
+     * Add a hidden parameter encoded in tn_parameters, the same way Tweakwise navigation requests apply visibility filters.
+     *
+     * @param string $attribute
+     * @param int|string $value
+     * @return void
+     */
+    public function addHiddenParameter(string $attribute, $value): void
+    {
+        $this->hiddenParameters[] = sprintf('%s=%s', $attribute, $value);
+        $this->setParameter('tn_parameters', implode('&', $this->hiddenParameters));
     }
 
     /**

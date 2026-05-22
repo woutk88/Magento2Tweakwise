@@ -43,7 +43,12 @@ trait AnchorRendererTrait
      */
     protected function getAnchorTagAttributes(Item $item): array
     {
-        $itemUrl = preg_replace('/&amp;p=\d+/', '', $this->getItemUrl($item));
+        $itemUrl = $this->getItemUrl($item);
+        // Remove p= from mid-query (e.g. ?color=red&amp;p=4 or ?color=red&p=4&amp;size=M)
+        $itemUrl = preg_replace('/(&amp;|&)p=\d+/', '', (string) $itemUrl);
+        // Remove p= when it is the first query parameter (e.g. ?p=4 or ?p=4&amp;color=red)
+        $itemUrl = preg_replace('/\?p=\d+(&amp;|&)?/', '?', (string) $itemUrl);
+        $itemUrl = rtrim($itemUrl, '?');
         if ($this->filterHelper->shouldFilterBeIndexable($item)) {
             return ['href' => $itemUrl];
         }

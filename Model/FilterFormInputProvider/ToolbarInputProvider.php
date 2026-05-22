@@ -32,7 +32,7 @@ class ToolbarInputProvider implements FilterFormInputProviderInterface
     /**
      * @inheritDoc
      */
-    public function getFilterFormInput()
+    public function getFilterFormInput(): array
     {
         $input = [];
         foreach (self::TOOLBAR_INPUTS as $toolbarInput) {
@@ -44,7 +44,6 @@ class ToolbarInputProvider implements FilterFormInputProviderInterface
             $input[$toolbarInput] = filter_var($toolbarInputValue, FILTER_SANITIZE_ENCODED);
         }
 
-        // @phpstan-ignore-next-line
         return $input;
     }
 }

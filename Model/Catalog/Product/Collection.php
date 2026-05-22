@@ -338,6 +338,10 @@ class Collection extends AbstractCollection
     }
 
     /**
+     * Remove the simple variant entry from the collection when its configurable parent is also present
+     * (grouped products mode). Uses the product entity_id rather than the array key, because addVisuals()
+     * calls array_splice() which reindexes the integer keys of $this->_items.
+     *
      * @return void
      */
     protected function removeDuplicatedProducts(): void
@@ -346,17 +350,31 @@ class Collection extends AbstractCollection
             return;
         }
 
-        foreach ($this->_items as $key => $item) {
+        // Build a map of entity_id => array key so we can locate items regardless of the
+        // (possibly reindexed) integer keys after array_splice in addVisuals().
+        $entityIdToKey = array_reduce(
+            array_keys($this->_items),
+            function (array $carry, $key): array {
+                $item = $this->_items[$key];
+                if ($item instanceof ProductInterface) {
+                    $carry[(int) $item->getId()] = $key;
+                }
+                return $carry;
+            },
+            []
+        );
+
+        foreach ($this->_items as $item) {
             if (!$item instanceof ProductInterface) {
                 continue;
             }
 
-            $twId = (int)$item->getData('tw_id') ?? '0';
-            if (!isset($this->_items[$twId]) || $key === $twId) {
+            $twId = (int) $item->getData('tw_id');
+            if ($twId === 0 || $twId === (int) $item->getId() || !isset($entityIdToKey[$twId])) {
                 continue;
             }
 
-            unset($this->_items[$twId]);
+            unset($this->_items[$entityIdToKey[$twId]], $entityIdToKey[$twId]);
         }
     }
 }

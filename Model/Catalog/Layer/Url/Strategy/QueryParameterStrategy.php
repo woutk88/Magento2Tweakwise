@@ -246,13 +246,16 @@ class QueryParameterStrategy implements UrlInterface, FilterApplierInterface, Ca
             $categoryUrl = $category->getUrl();
             $categoryUrlPath = parse_url($categoryUrl, PHP_URL_PATH);
 
+            $categoryFilters = $this->getAttributeFilters($request);
+            unset($categoryFilters[self::PARAM_PAGE]);
+
             $url = $this->url->getDirectUrl(
                 sprintf(
                     '%s/',
                     trim($categoryUrlPath, '/'), // @phpstan-ignore-line
                 ),
                 [
-                    '_query' => $this->getAttributeFilters($request)
+                    '_query' => $categoryFilters
                 ]
             );
 
@@ -492,7 +495,7 @@ class QueryParameterStrategy implements UrlInterface, FilterApplierInterface, Ca
 
         $page = $this->getPage($request);
 
-        if ($page && (bool) $navigationRequest->getParameter('resetPagination') === false) {
+        if ($page) {
             $navigationRequest->setPage($page);
         }
 
