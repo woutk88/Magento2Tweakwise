@@ -95,7 +95,10 @@ class ProductNavigationResponse extends Response
         $productData = [];
         // @phpstan-ignore-next-line
         foreach ($this->getItems() as $item) {
-            $data = [];
+            $itemId = $this->helper->getStoreId($item->getId());
+
+            $data = $productData[$itemId] ?? [];
+
             if ($item->getImage()) {
                 // Remove domain and media path when full url is used
                 $imageUrl = preg_replace('#^.*?/catalog/product/#', '', $item->getImage());
@@ -107,10 +110,15 @@ class ProductNavigationResponse extends Response
                 $data[ItemType::TWEAKWISE_ID] = $tweakwiseId;
             }
 
-            $data[ItemType::COLSPAN] = $item->getColspan();
-            $data[ItemType::ROWSPAN] = $item->getRowspan();
+            // When multiple Tweakwise group codes resolve to the same Magento store ID (via
+            // getStoreId), keep the maximum colspan/rowspan so that a merchandised span is
+            // never silently overwritten by a subsequent item with a lower value.
+            $colspan = max((int) $item->getColspan(), (int) ($data[ItemType::COLSPAN] ?? 0));
+            $data[ItemType::COLSPAN] = $colspan !== 0 ? $colspan : null;
+            $rowspan = max((int) $item->getRowspan(), (int) ($data[ItemType::ROWSPAN] ?? 0));
+            $data[ItemType::ROWSPAN] = $rowspan !== 0 ? $rowspan : null;
 
-            $productData[$this->helper->getStoreId($item->getId())] = $data;
+            $productData[$itemId] = $data;
         }
 
         return $productData;

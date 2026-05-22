@@ -10,6 +10,7 @@ use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Layer\Category\CollectionFilter;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Tweakwise\Magento2Tweakwise\Model\Client\Request;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -76,6 +77,7 @@ class DataProviderHelper
      * @param ProductCollectionFactory $productCollectionFactory
      * @param CollectionFilter $collectionFilter
      * @param ProductItemFactory $productItemFactory
+     * @param CatalogConfig $catalogConfig
      */
     public function __construct(
         Config $config,
@@ -134,6 +136,24 @@ class DataProviderHelper
         $categoryId = $store->getRootCategoryId();
         // @phpstan-ignore-next-line
         return $this->categoryRepository->get($categoryId);
+    }
+
+    /**
+     * Add visibility filter to a suggestion request using tn_parameters,
+     * matching the search visibility filter behaviour in NavigationContext.
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function addVisibilityFilter(Request $request): void
+    {
+        $visibilityAttribute = $this->config->isGroupedProductsEnabled()
+            ? 'parent_visibility'
+            : 'visibility';
+
+        foreach ([Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH] as $visibilityValue) {
+            $request->addHiddenParameter($visibilityAttribute, $visibilityValue);
+        }
     }
 
     /**
